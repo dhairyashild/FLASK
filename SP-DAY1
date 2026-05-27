@@ -1,0 +1,66 @@
+from flask import Flask, request, jsonify
+
+app = Flask(__name__)
+
+@app.route("/")
+def hello_world():
+    return "<p>Hello, World!</p>"
+
+@app.route("/post", methods=["POST"])
+def hello_world1():
+    data = request.get_json(force=True)
+    return data
+
+@app.route("/query", methods=["GET"])
+def handle_query():
+    name = request.args.get("name", "Guest")
+    age = request.args.get("age", "Unknown")
+    return jsonify({"type": "Query Parameter", "name": name, "age": age})
+
+@app.route("/form", methods=["POST"])
+def handle_form():
+    username = request.form.get("username", "No username sent")
+    password = request.form.get("password", "No password sent")
+    return jsonify({"type": "Form Data", "username": username, "password": password})
+
+# ADDED TYPE 4: HEADERS FUNCTION
+@app.route("/headers", methods=["GET"])
+def handle_headers():
+    # request.headers extracts custom or standard metadata keys sent with the request
+    api_key = request.headers.get("X-API-Key", "No key provided")
+    user_agent = request.headers.get("User-Agent")
+    return jsonify({
+        "type": "Headers",
+        "X-API-Key": api_key,
+        "User-Agent": user_agent
+    })
+
+if __name__ == "__main__":
+    app.run(debug=True)
+
+####################################################
+
+================================================================================
+               POSTMAN CONFIGURATION GUIDE FOR THE 4 PARAMETERS
+================================================================================
+
+1. Query Parameters
+   - URL Path: http://127.0.0.1:5000/query?name=Alice&age=30
+   - Postman Location: Params tab (Automatically populates from the URL string).
+   - Format: Entered as Key/Value rows directly under the URL bar.
+
+2. JSON Parameters
+   - URL Path: http://127.0.0.1:5000/json (or /post)
+   - Postman Location: Body tab -> Select 'raw' radio button.
+   - Format: Change dropdown on far right to 'JSON' -> Paste {"key": "value"}.
+
+3. Form Data
+   - URL Path: http://127.0.0.1:5000/form
+   - Postman Location: Body tab -> Select 'form-data' radio button.
+   - Format: Enter fields in the grid as Key: username | Value: Alice.
+
+4. Headers
+   - URL Path: http://127.0.0.1:5000/headers
+   - Postman Location: Headers tab (Located between Params and Body).
+   - Format: Scroll down to an empty row -> Key: X-API-Key | Value: secret123.
+================================================================================
